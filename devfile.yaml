@@ -1,0 +1,53 @@
+schemaVersion: 2.1.0
+metadata:
+  name: camel-demo
+  version: 1.1.0
+  attributes:
+    alpha.build-context: .
+    alpha.build-dockerfile: src/main/docker/Dockerfile.jvm.multi-stage
+  displayName: Camel Demo
+  description: Camel Demo based on Quarkus
+  projectType: "quarkus"
+  language: "java"
+components:
+  - name: buildguidance
+    container:
+      image: buildguidanceimage-placeholder
+      memoryLimit: 1024Mi
+      endpoints:
+        - name: http-8081
+          targetPort: 8081
+  - name: tools
+    attributes:
+      tool: console-import
+    container:
+      image: quay.io/eclipse/che-quarkus:nightly
+      memoryLimit: 1512Mi
+      mountSources: true
+      volumeMounts:
+        - name: m2
+          path: /home/user/.m2
+      endpoints:
+        - name: '8080-http'
+          targetPort: 8080
+  - name: m2
+    volume:
+      size: 3Gi
+commands:
+  - id: init-compile
+    exec:
+      component: tools
+      commandLine: "mvn -Dmaven.repo.local=/home/user/.m2/repository compile"
+      workingDir: $PROJECTS_ROOT
+  - id: dev-run
+    exec:
+      component: tools
+      commandLine: "mvn -Dmaven.repo.local=/home/user/.m2/repository quarkus:dev -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+      hotReloadCapable: true
+      group:
+        kind: run
+        isDefault: true
+      workingDir: $PROJECTS_ROOT
+events:
+  postStart:
+    - init-compile
