@@ -10,18 +10,11 @@ metadata:
   projectType: "quarkus"
   language: "java"
 components:
-  - name: buildguidance
-    container:
-      image: buildguidanceimage-placeholder
-      memoryLimit: 1024Mi
-      endpoints:
-        - name: http-8081
-          targetPort: 8081
   - name: tools
     attributes:
       tool: console-import
     container:
-      image: quay.io/eclipse/che-quarkus:nightly
+      image: quay.io/eclipse/che-quarkus:next
       memoryLimit: 1512Mi
       mountSources: true
       volumeMounts:
@@ -38,7 +31,7 @@ commands:
     exec:
       component: tools
       commandLine: "mvn -Dmaven.repo.local=/home/user/.m2/repository compile"
-      workingDir: $PROJECTS_ROOT
+      workingDir: $CHE_PROJECTS_ROOT
   - id: dev-run
     exec:
       component: tools
@@ -47,7 +40,7 @@ commands:
       group:
         kind: run
         isDefault: true
-      workingDir: $PROJECTS_ROOT
+      workingDir: $CHE_PROJECTS_ROOT
 events:
   postStart:
     - init-compile
