@@ -21,7 +21,7 @@ components:
     attributes:
       tool: console-import
     container:
-      image: quay.io/eclipse/che-quarkus:nightly
+      image: quay.io/eclipse/che-quarkus:next
       memoryLimit: 1512Mi
       mountSources: true
       volumeMounts:
